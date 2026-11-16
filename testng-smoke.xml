@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Smoke suite: only tests tagged with groups = "smoke".
+
+  Run this after a deployment to answer "is the service fundamentally working?".
+  Keep it under a couple of minutes; depth belongs in the regression suite.
+-->
+<suite name="API Smoke Suite" verbose="1" parallel="none">
+
+  <listeners>
+    <listener class-name="com.example.framework.listeners.TestListener"/>
+    <listener class-name="com.example.framework.listeners.RetryTransformer"/>
+  </listeners>
+
+  <test name="Smoke Tests">
+    <groups>
+      <run>
+        <include name="smoke"/>
+      </run>
+    </groups>
+    <packages>
+      <package name="com.example.tests.*"/>
+    </packages>
+  </test>
+
+</suite>

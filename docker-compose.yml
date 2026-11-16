@@ -1,0 +1,11 @@
+services:
+  api-tests:
+    build:
+      context: .
+    environment:
+      ENV: ${ENV:-qa}
+      FRAMEWORK_LOG_REQUESTS: ${FRAMEWORK_LOG_REQUESTS:-false}
+    volumes:
+      # Keep Allure results and Surefire reports on the host after the container exits.
+      - ./target/allure-results:/app/target/allure-results
+      - ./target/surefire-reports:/app/target/surefire-reports

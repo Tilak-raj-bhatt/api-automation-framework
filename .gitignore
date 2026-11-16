@@ -1,0 +1,34 @@
+# Build output
+target/
+build/
+out/
+
+# Allure reports are generated, never committed
+allure-results/
+allure-report/
+
+# IDE metadata
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+*.launch
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local secrets and machine-specific overrides
+.env
+*.local
+local.properties
+
+# Logs
+*.log
+logs/

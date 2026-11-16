@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.example</groupId>
+  <artifactId>api-automation-framework</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>API Automation Framework</name>
+  <description>Enterprise-style REST Assured + TestNG framework for learning API automation</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <!-- Dependency versions: keep them in one place so upgrades are a one-line change -->
+    <rest-assured.version>5.5.0</rest-assured.version>
+    <testng.version>7.10.2</testng.version>
+    <allure.version>2.29.0</allure.version>
+    <jackson.version>2.17.2</jackson.version>
+    <slf4j.version>2.0.13</slf4j.version>
+    <logback.version>1.5.6</logback.version>
+    <hamcrest.version>2.2</hamcrest.version>
+    <javafaker.version>1.0.2</javafaker.version>
+    <snakeyaml.version>2.2</snakeyaml.version>
+
+    <!-- Runtime switches. Override from the command line, e.g. -Denv=dev -Dsuite.file=testng-smoke.xml -->
+    <env>qa</env>
+    <suite.file>testng.xml</suite.file>
+  </properties>
+
+  <dependencies>
+
+    <!-- Core REST Assured: request/response DSL, JSONPath, Hamcrest matchers -->
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>${rest-assured.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- JSON Schema contract validation -->
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>${rest-assured.version}</version>
+    </dependency>
+
+    <!-- Test runner -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+    </dependency>
+
+    <!-- Allure reporting + automatic HTTP request/response attachments -->
+    <dependency>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-testng</artifactId>
+      <version>${allure.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-rest-assured</artifactId>
+      <version>${allure.version}</version>
+    </dependency>
+
+    <!-- POJO (de)serialization -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <!-- Realistic random test data -->
+    <dependency>
+      <groupId>com.github.javafaker</groupId>
+      <artifactId>javafaker</artifactId>
+      <version>${javafaker.version}</version>
+      <exclusions>
+        <!-- Force a patched, non-vulnerable SnakeYAML version -->
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
+
+    <!-- Logging facade + implementation -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <!-- Assertion matchers: equalTo, hasItem, containsString, ... -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>${hamcrest.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <finalName>api-automation-framework</finalName>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- A TestNG suite XML file is the single source of truth for what runs -->
+          <suiteXmlFiles>
+            <suiteXmlFile>${suite.file}</suiteXmlFile>
+          </suiteXmlFiles>
+          <systemPropertyVariables>
+            <env>${env}</env>
+            <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+          </systemPropertyVariables>
+          <argLine>-Dfile.encoding=UTF-8</argLine>
+          <!-- Keep going so the full picture is reported; the build still fails on errors -->
+          <testFailureIgnore>false</testFailureIgnore>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <!-- Fast feedback: only @Test(groups = "smoke") -->
+    <profile>
+      <id>smoke</id>
+      <properties>
+        <suite.file>testng-smoke.xml</suite.file>
+      </properties>
+    </profile>
+
+    <!-- Full regression (the default) -->
+    <profile>
+      <id>regression</id>
+      <properties>
+        <suite.file>testng.xml</suite.file>
+      </properties>
+    </profile>
+
+  </profiles>
+
+</project>
